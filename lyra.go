@@ -256,3 +256,4 @@ func fetchProxies() {
 	fmt.Printf("Failed           : %d\n", failed)
 	fmt.Printf("Success rate    : %.1f%%\n", float64(success)/float64(total)*100)
 }
+}
