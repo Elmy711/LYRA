@@ -1,32 +1,3 @@
-Skip to content
-minority1001
-tornado
-Repository navigation
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security and quality
-Insights
-Settings
-tornado
-/tornado.go
-Go to file
-t
-T
-minority1001
-minority1001
-Update tornado.go
-ca2355f
- · 
-last week
-
-Code
-
-Blame
-683 lines (632 loc) · 19.6 KB
 package main
 
 import (
@@ -162,7 +133,7 @@ func fetchProxies() {
 
 	fmt.Println("[*] Download proxy dari source...")
 	client := &http.Client{
-		Timeout: 10 * time.Seconds
+		Timeout: 10 * time.Second,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
